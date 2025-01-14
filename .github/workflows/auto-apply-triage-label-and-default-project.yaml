@@ -1,4 +1,4 @@
-name: label_and_assign_project
+name: Auto apply triage label and add to project
 
 on:
   issues:
@@ -10,46 +10,23 @@ jobs:
   label_and_assign_project:
     runs-on: ubuntu-latest
 
-    # Basic permissions. If your org’s default GITHUB_TOKEN can update org-level Projects Beta,
-    # this is enough. If you see permission errors, you might need a Personal Access Token
-    # with the "project" scope instead.
     permissions:
       issues: write
-      repository-projects: write
+      contents: read
+      project: write  # Required for actions/add-to-project
 
     steps:
-      # 1) Install or update the official GitHub CLI to ensure we get the Beta project commands
-      - name: Install/Update GitHub CLI
-        run: |
-          # Remove any existing older 'gh'
-          sudo apt-get remove gh -y || true
-          # Add GitHub CLI official key & apt repository
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-            | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) \
-            signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
-            https://cli.github.com/packages stable main" \
-            | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          # Install newest gh
-          sudo apt-get update
-          sudo apt-get install gh -y
-          # Debug: show version
-          gh --version
-
-      # 2) If no milestone, add 'triage' label
+      # 1. Add "triage" label if no milestone
       - name: Add "triage" label if no milestone
         if: ${{ github.event.issue.milestone == null }}
-        run: |
-          gh issue edit ${{ github.event.issue.number }} \
-            --repo quantumjs/launch-track \
-            --add-label triage
+        run: gh issue edit ${{ github.event.issue.number }} --repo quantumjs/launch-track --add-label triage
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 3) Add the issue to the org-level Beta Project #1
-      - name: Add issue to org-level project
-        run: |
-          gh project item-add quantumjs/1 \
-            --content-id "${{ github.event.issue.node_id }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 2. Add issue to org-level project using actions/add-to-project
+      - name: Add issue to project
+        uses: actions/add-to-project@v1
+        with:
+          project-url: https://github.com/orgs/quantumjs/projects/1
+          content-id: ${{ github.event.issue.node_id }}
+          token: ${{ secrets.GITHUB_TOKEN }}
