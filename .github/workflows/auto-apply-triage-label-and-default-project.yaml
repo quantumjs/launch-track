@@ -13,17 +13,18 @@ jobs:
     permissions:
       issues: write
       contents: read
-      project: write  # Required for actions/add-to-project
+      project: write
 
     steps:
-      # 1. Add "triage" label if no milestone
       - name: Add "triage" label if no milestone
         if: ${{ github.event.issue.milestone == null }}
-        run: gh issue edit ${{ github.event.issue.number }} --repo quantumjs/launch-track --add-label triage
+        run: |
+          gh issue edit ${{ github.event.issue.number }} \
+            --repo quantumjs/launch-track \
+            --add-label triage
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Add issue to org-level project using actions/add-to-project
       - name: Add issue to project
         uses: actions/add-to-project@v1
         with:
