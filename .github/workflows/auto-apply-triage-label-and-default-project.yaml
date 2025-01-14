@@ -19,14 +19,13 @@ jobs:
         run: |
           gh issue edit ${{ github.event.issue.number }} \
             --repo quantumjs/launch-track \
-            --add-label triage
+            --add-label triage2
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
-      - name: Add issue to org-level project #X
-        run: gh project item-add quantumjs/launch-track \
-          --content-id "${{ github.event.issue.node_id }}"
+      - name: Add issue to org-level project
+        run: gh project item-add quantumjs/1 --content-id "${{ github.event.issue.node_id }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
