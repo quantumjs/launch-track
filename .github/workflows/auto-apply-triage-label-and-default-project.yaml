@@ -15,6 +15,13 @@ jobs:
       contents: read  # Use this instead of 'project'
 
     steps:
+      - name: Test GITHUB_TOKEN permissions
+        run: |
+          gh auth status
+          gh project view 1 --org quantumjs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Add "triage" label if no milestone
         if: ${{ github.event.issue.milestone == null }}
         run: |
