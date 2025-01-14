@@ -9,26 +9,11 @@ on:
 jobs:
   label_and_assign_project:
     runs-on: ubuntu-latest
-
-    # If your org policies allow the default GITHUB_TOKEN to modify org-level projects,
-    # then 'repository-projects: write' is often enough.
-    # If you see permission errors, you may need to supply a Personal Access Token
-    # with the 'project' scope instead.
     permissions:
       issues: write
-      repository-projects: write
+      repository-projects: write  # This covers classic projects; in many orgs, it also "just works" for Beta Projects
 
     steps:
-      # 1) Update gh CLI to a version that supports Projects Beta
-      - name: Install/Update gh CLI
-        run: |
-          sudo apt-get update
-          # Remove old gh if it's installed
-          sudo apt-get remove gh -y || true
-          # Install newest gh
-          sudo apt-get install -y gh
-
-      # 2) If no milestone, add the 'triage' label
       - name: Add "triage" label if no milestone
         if: ${{ github.event.issue.milestone == null }}
         run: |
@@ -38,10 +23,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 3) Add the issue to your org-level Beta Project #1
+
+
       - name: Add issue to org-level project
-        run: |
-          gh project item-add quantumjs/1 \
-            --content-id "${{ github.event.issue.node_id }}"
+        run: gh project item-add quantumjs/1 --content-id "${{ github.event.issue.node_id }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
