@@ -16,9 +16,10 @@ jobs:
     steps:
       - name: Add "triage" label if no milestone
         if: ${{ github.event.issue.milestone == null }}
-        run: gh issue edit quantumjs/launch-track#${{ github.event.issue.number }} --add-label triage
+        run: gh issue edit ${{ github.event.issue.number }} --repo quantumjs/launch-track --add-label triage
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
       - name: Add issue to org-level project #X
