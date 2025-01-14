@@ -19,7 +19,7 @@ jobs:
         run: |
           gh issue edit ${{ github.event.issue.number }} \
             --repo quantumjs/launch-track \
-            --add-label triage2
+            --add-label triage
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
